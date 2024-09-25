@@ -1,47 +1,46 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  <div class="container">
+    <h1 class="title">Welcome to Vue with Sass!</h1>
+    <button class="btn-primary">Click Me</button>
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
+<script>
+export default {
+  name: "SassExample",
+};
+</script>
+
+<style lang="scss">
+$primary-color: #3498db;
+$secondary-color: #e74c3c;
+
+// Mixin definition
+@mixin button-styles($color) {
+  background-color: $color;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken($color, 10%);
+  }
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
+.container {
+  text-align: center;
+  padding: 20px;
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+  .title {
+    color: $primary-color;
+    font-size: 2em;
+    margin-bottom: 20px;
   }
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
+  .btn-primary {
+    @include button-styles($primary-color);
   }
 }
 </style>

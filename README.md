@@ -1,397 +1,201 @@
-# Crash Course on Vue
+### **SASS Crash Course with VueJS**
 
----
+Sass (Syntactically Awesome Style Sheets) is a powerful CSS preprocessor that provides advanced features like variables, nesting, mixins, inheritance, and more. When combined with Vue.js, it allows for more maintainable and scalable styles.
 
-### 1. **Create-Vue Setup**
+Here’s a crash course on using Sass with Vue.js:
 
-Make sure you have an up-to-date version of Node.js installed and your current working directory is the one where you intend to create a project. Run the following command in your command line
+### **1. Setting Up Sass in Vue.js**
 
-**Installation & Setup:**
+First, ensure you have Sass installed in your Vue project. Vue CLI comes with built-in support for Sass, but you’ll need to install the Sass dependencies if you don’t already have them.
 
-```bash
-# Install Vue CLI
-npm create vue@latest my-vue-app
-```
-
-This command will install and execute create-vue, the official Vue project scaffolding tool. You will be presented with prompts for several optional features such as TypeScript and testing support:
-
-![1727228652840](image/README/1727228652840.png)
-
-If you are unsure about an option, simply choose No by hitting enter for now. Once the project is created, follow the instructions to install dependencies and start the dev server:
+#### **Installation:**
 
 ```bash
-# Navigate into your project
-
-cd my-vue-app
-
-# Install dependencies
-
-npm install
-
-# Start development server
-
-npm run serve
+npm install sass sass-loader --save-dev
 ```
 
-After running `npm run serve`, you should see your app running at `http://localhost:8080`.
+### **2. Basic Sass Concepts**
+
+#### **Variables:**
+
+Variables in Sass allow you to store values (like colors, fonts, or any CSS value) and reuse them throughout your stylesheet.
+
+```scss
+// styles.scss
+$primary-color: #3498db;
+
+body {
+  background-color: $primary-color;
+}
+```
+
+#### **Nesting:**
+
+You can nest your CSS rules to reflect the HTML structure, making the styles more readable.
+
+```scss
+nav {
+  ul {
+    list-style: none;
+  }
+
+  a {
+    text-decoration: none;
+  }
+}
+```
+
+#### **Mixins:**
+
+Mixins are reusable chunks of code, like functions in JavaScript, that allow you to pass in values.
+
+```scss
+@mixin button-styles($color) {
+  background-color: $color;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+button {
+  @include button-styles(#e74c3c);
+}
+```
+
+#### **Inheritance:**
+
+Sass allows one selector to inherit from another, reducing redundancy in your CSS.
+
+```scss
+.message {
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.success {
+  @extend .message;
+  background-color: #2ecc71;
+}
+
+.error {
+  @extend .message;
+  background-color: #e74c3c;
+}
+```
 
 ---
 
-### 2. **ref() & Reactive Values**
+### **3. Using Sass in Vue Components**
 
-In Vue 3, the Composition API introduces `ref()` and `reactive()` for managing state.
+In Vue components, you can write your styles using `<style lang="scss">` to enable Sass syntax.
 
-**Example using `ref()`:**
+#### **Example Vue Component with Sass:**
 
-```js
+```vue
+<!-- // App.Vue -->
+
 <template>
-  <div>
-    <p>Count: {{ count }}</p>
-    <button @click="increment">Increment</button>
+  <div class="container">
+    <h1 class="title">Welcome to Vue with Sass!</h1>
+    <button class="btn-primary">Click Me</button>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
-
 export default {
-  setup() {
-    const count = ref(0);
-    const increment = () => {
-      count.value++;
-    };
-
-    return { count, increment };
-  },
+  name: "SassExample",
 };
 </script>
+
+<style lang="scss">
+$primary-color: #3498db;
+$secondary-color: #e74c3c;
+
+// Mixin definition
+@mixin button-styles($color) {
+  background-color: $color;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken($color, 10%);
+  }
+}
+
+.container {
+  text-align: center;
+  padding: 20px;
+
+  .title {
+    color: $primary-color;
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+
+  .btn-primary {
+    @include button-styles($primary-color);
+  }
+}
+</style>
 ```
 
-- `ref()` wraps primitive values to make them reactive.
-- Access the actual value via `.value`.
+#### **Explanation:**
 
-**Example using `reactive()`:**
+- **Variables:** `$primary-color` and `$secondary-color` are used to manage colors across the component.
+- **Nesting:** Inside the `.container` class, the `.title` and `.btn-primary` are styled.
+- **Mixin:** The `button-styles` mixin helps reuse the button styling logic with different colors.
 
-```js
+### **4. Scoped Styles with Sass in Vue**
+
+Vue supports scoped styles to ensure styles only apply to the current component, preventing conflicts.
+
+```vue
 <template>
-  <div>
-    <p>{{ user.name }} (Age: {{ user.age }})</p>
-    <button @click="growOlder">Grow Older</button>
+  <div class="scoped-container">
+    <p>This is a scoped style!</p>
   </div>
 </template>
 
 <script>
-import { reactive } from 'vue';
-
 export default {
-  setup() {
-    const user = reactive({ name: 'John', age: 30 });
-
-    const growOlder = () => {
-      user.age++;
-    };
-
-    return { user, growOlder };
-  },
+  name: "ScopedSassExample",
 };
 </script>
+
+<style lang="scss" scoped>
+$scoped-color: #8e44ad;
+
+.scoped-container {
+  background-color: $scoped-color;
+  padding: 10px;
+  border-radius: 5px;
+  p {
+    color: white;
+  }
+}
+</style>
 ```
 
-- `reactive()` wraps objects to make their properties reactive.
+### **5. Global Sass Styles in Vue**
 
----
-
-### 3. **v-if, v-else & v-else-if Directives**
-
-These are used to conditionally render elements in the DOM.
-
-**Example:**
-
-```html
-<template>
-  <div>
-    <p v-if="loggedIn">Welcome back!</p>
-    <p v-else-if="loading">Loading...</p>
-    <p v-else>You need to log in.</p>
-  </div>
-</template>
-
-<script>
-  export default {
-    data() {
-      return {
-        loggedIn: false,
-        loading: true,
-      };
-    },
-  };
-</script>
-```
-
-- `v-if` renders content based on a condition.
-- `v-else-if` and `v-else` act as fallbacks.
-
----
-
-### 4. **v-for Directive & Looping**
-
-`v-for` is used to loop over data and render lists.
-
-**Example:**
-
-```html
-<template>
-  <ul>
-    <li v-for="(item, index) in items" :key="index">{{ item }}</li>
-  </ul>
-</template>
-
-<script>
-  export default {
-    data() {
-      return {
-        items: ["Apple", "Banana", "Orange"],
-      };
-    },
-  };
-</script>
-```
-
-- Use `v-for` to loop through an array.
-- Always use `:key` to uniquely identify items in a list.
-
----
-
-### 5. **v-bind Directive**
-
-`v-bind` is used to bind HTML attributes dynamically.
-
-**Example:**
-
-```html
-<template>
-  <img :src="imageUrl" alt="Dynamic Image" />
-</template>
-
-<script>
-  export default {
-    data() {
-      return {
-        imageUrl: "https://via.placeholder.com/150",
-      };
-    },
-  };
-</script>
-```
-
-- `v-bind` binds an expression to the attribute (e.g., `src`, `alt`, etc.).
-- Shorthand for `v-bind` is `:`, e.g., `:src="imageUrl"`.
-
----
-
-### 6. **v-on Directive, Events & Methods**
-
-`v-on` is used to listen to events, like click, input, etc.
-
-**Example:**
-
-```html
-<template>
-  <button @click="handleClick">Click me</button>
-</template>
-
-<script>
-  export default {
-    methods: {
-      handleClick() {
-        alert("Button clicked!");
-      },
-    },
-  };
-</script>
-```
-
-- `v-on` is used to bind events like `click`.
-- Shorthand for `v-on` is `@`, e.g., `@click="handleClick"`.
-
----
-
-### 7. **Forms & v-model**
-
-`v-model` creates two-way data binding between form elements and Vue's data.
-
-**Example:**
-
-```html
-<template>
-  <input v-model="name" placeholder="Enter your name" />
-  <p>Hello, {{ name }}!</p>
-</template>
-
-<script>
-  export default {
-    data() {
-      return {
-        name: "",
-      };
-    },
-  };
-</script>
-```
-
-- `v-model` automatically syncs data between the input field and Vue’s data.
-
----
-
-### 8. **Lifecycle Methods**
-
-Vue components go through several lifecycle stages. Common lifecycle hooks:
-
-- `created()`: Called when the component is created.
-- `mounted()`: Called when the component is mounted to the DOM.
-- `updated()`: Called when the component’s data changes.
-- `beforeUnmount()`: Called before the component is destroyed.
-
-**Example:**
+To add global styles across your Vue application, create a `.scss` file (e.g., `global.scss`) and import it in your `main.js`:
 
 ```js
-export default {
-  created() {
-    console.log("Component is created!");
-  },
-  mounted() {
-    console.log("Component is mounted!");
-  },
-  beforeUnmount() {
-    console.log("Component is about to be destroyed!");
-  },
-};
+// main.js
+import { createApp } from "vue";
+import App from "./App.vue";
+import "./assets/styles/global.scss";
+
+createApp(App).mount("#app");
 ```
+
+You can define global variables, mixins, and more in this file to be used across your components.
 
 ---
 
-### 9. **onMounted & Fetching Data**
+### **Conclusion**
 
-`onMounted` is part of the Composition API and is similar to the `mounted()` hook.
-
-**Example:**
-
-```html
-<template>
-  <div>
-    <p v-if="loading">Loading data...</p>
-    <p v-else>Data: {{ data }}</p>
-  </div>
-</template>
-
-<script>
-  import { ref, onMounted } from "vue";
-
-  export default {
-    setup() {
-      const data = ref(null);
-      const loading = ref(true);
-
-      onMounted(async () => {
-        const response = await fetch("https://api.example.com/data");
-        const result = await response.json();
-        data.value = result;
-        loading.value = false;
-      });
-
-      return { data, loading };
-    },
-  };
-</script>
-```
-
-- `onMounted()` runs when the component is mounted.
-- Ideal for fetching data from APIs.
-
----
-
-### 10. **Components and Props**
-
-Components allow code reuse. You can pass data into components using props.
-
-**Parent Component:**
-
-```html
-<template>
-  <div>
-    <ChildComponent :message="parentMessage" />
-  </div>
-</template>
-
-<script>
-  import ChildComponent from "./ChildComponent.vue";
-
-  export default {
-    data() {
-      return {
-        parentMessage: "Hello from the parent!",
-      };
-    },
-    components: {
-      ChildComponent,
-    },
-  };
-</script>
-```
-
-**Child Component:**
-
-```html
-<template>
-  <p>{{ message }}</p>
-</template>
-
-<script>
-  export default {
-    props: {
-      message: String,
-    },
-  };
-</script>
-```
-
-- The parent passes data to the child using `props`.
-- The child accesses the passed data using the `props` object.
-
----
-
-### 11. **Composition API**
-
-The Composition API is a new way to organize Vue component logic. It provides better organization and reusability of code.
-
-**Example:**
-
-```html
-<template>
-  <div>
-    <p>Count: {{ count }}</p>
-    <button @click="increment">Increment</button>
-  </div>
-</template>
-
-<script>
-  import { ref } from "vue";
-
-  export default {
-    setup() {
-      const count = ref(0);
-      const increment = () => {
-        count.value++;
-      };
-
-      return { count, increment };
-    },
-  };
-</script>
-```
-
-- Instead of using the `data()`, `methods`, and `computed` options separately, the Composition API uses the `setup()` function to handle logic in one place.
-
----
-
-This covers the basic crash course on Vue.js! Each of these examples demonstrates core concepts you'll need when building Vue apps.
+By integrating Sass into Vue.js, you can simplify your styles with features like variables, nesting, and mixins. It helps keep your styles clean, modular, and scalable. Start experimenting with these features and tailor them to your project needs!
