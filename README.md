@@ -1,201 +1,196 @@
-### **SASS Crash Course with VueJS**
+# Todo App with Vue and SASS
 
-Sass (Syntactically Awesome Style Sheets) is a powerful CSS preprocessor that provides advanced features like variables, nesting, mixins, inheritance, and more. When combined with Vue.js, it allows for more maintainable and scalable styles.
+Ensure the structure of your project looks something like this:
 
-Here’s a crash course on using Sass with Vue.js:
+```arduino
+vue-todo-app/
+├── src/
+│   ├── assets/
+│   ├── components/
+│   │   └── TodoItem.vue
+│   ├── App.vue
+│   ├── main.js
+├── public/
+├── package.json
+├── vite.config.js
+```
 
-### **1. Setting Up Sass in Vue.js**
+### Step 3: Create TodoItem Component
 
-First, ensure you have Sass installed in your Vue project. Vue CLI comes with built-in support for Sass, but you’ll need to install the Sass dependencies if you don’t already have them.
+Let's create a simple component to display individual Todo items.
 
-#### **Installation:**
+1. **Create `TodoItem.vue`:** Inside the `src/components/` directory, create a new file `TodoItem.vue`:
+
+   ```vue
+   <template>
+     <div class="todo-item">
+       <input type="checkbox" v-model="todo.completed" />
+       <span :class="{ completed: todo.completed }">{{ todo.text }}</span>
+       <button @click="removeTodo">Delete</button>
+     </div>
+   </template>
+
+   <script setup>
+   defineProps({
+     todo: Object,
+     removeTodo: Function,
+   });
+   </script>
+
+   <style lang="scss" scoped>
+   .todo-item {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 10px;
+     background-color: #f9f9f9;
+     margin-bottom: 8px;
+     border-radius: 4px;
+
+     span {
+       flex: 1;
+       margin-left: 10px;
+     }
+
+     .completed {
+       text-decoration: line-through;
+       color: #777;
+     }
+
+     button {
+       background: none;
+       border: none;
+       color: red;
+       cursor: pointer;
+     }
+   }
+   </style>
+   ```
+
+### Step 4: Update App.vue
+
+Now, let's modify the `App.vue` to handle adding, deleting, and displaying Todo items.
+
+1. **Replace the contents of `App.vue`:**
+
+   ```vue
+   <template>
+     <div class="todo-app">
+       <h1>Todo List</h1>
+       <form @submit.prevent="addTodo">
+         <input v-model="newTodo" type="text" placeholder="Add a new todo" />
+         <button type="submit">Add</button>
+       </form>
+
+       <div class="todo-list">
+         <TodoItem
+           v-for="(todo, index) in todos"
+           :key="index"
+           :todo="todo"
+           :removeTodo="() => removeTodo(index)"
+         />
+       </div>
+     </div>
+   </template>
+
+   <script setup>
+   import { ref } from "vue";
+   import TodoItem from "./components/TodoItem.vue";
+
+   // Reactive state
+   const newTodo = ref("");
+   const todos = ref([
+     { text: "Learn Vue.js", completed: false },
+     { text: "Build a Todo App", completed: false },
+   ]);
+
+   // Add a new todo
+   const addTodo = () => {
+     if (newTodo.value.trim()) {
+       todos.value.push({
+         text: newTodo.value,
+         completed: false,
+       });
+       newTodo.value = "";
+     }
+   };
+
+   // Remove a todo by index
+   const removeTodo = (index) => {
+     todos.value.splice(index, 1);
+   };
+   </script>
+
+   <style lang="scss">
+   .todo-app {
+     max-width: 400px;
+     margin: 100px auto;
+     padding: 20px;
+     border-radius: 10px;
+     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+     background-color: #ffffff;
+   }
+
+   h1 {
+     text-align: center;
+     margin-bottom: 20px;
+   }
+
+   form {
+     display: flex;
+     justify-content: space-between;
+     margin-bottom: 20px;
+
+     input {
+       flex: 1;
+       padding: 10px;
+       margin-right: 10px;
+       border-radius: 5px;
+       border: 1px solid #ddd;
+     }
+
+     button {
+       padding: 10px 15px;
+       background-color: #42b883;
+       color: white;
+       border: none;
+       border-radius: 5px;
+       cursor: pointer;
+
+       &:hover {
+         background-color: #38a06f;
+       }
+     }
+   }
+
+   .todo-list {
+     margin-top: 20px;
+   }
+   </style>
+   ```
+
+### Step 5: Run the Application
+
+Now that you've set up everything, start your Vue.js application by running:
 
 ```bash
-npm install sass sass-loader --save-dev
+npm run dev
 ```
 
-### **2. Basic Sass Concepts**
+Visit `http://localhost:3000` in your browser, and you should see a working Todo application!
 
-#### **Variables:**
+![1727229921864](image/README/1727229921864.png)
 
-Variables in Sass allow you to store values (like colors, fonts, or any CSS value) and reuse them throughout your stylesheet.
+### Explanation of Code
 
-```scss
-// styles.scss
-$primary-color: #3498db;
+- **Vue Composition API** (`<script setup>`):
 
-body {
-  background-color: $primary-color;
-}
-```
+  - We use `ref` to create reactive state variables.
+  - `newTodo` is a reactive string that holds the current input value for a new todo.
+  - `todos` is a reactive array of todo objects.
+  - We use methods like `addTodo` and `removeTodo` to manipulate these reactive state variables.
 
-#### **Nesting:**
+- **SCSS Styling**:
 
-You can nest your CSS rules to reflect the HTML structure, making the styles more readable.
-
-```scss
-nav {
-  ul {
-    list-style: none;
-  }
-
-  a {
-    text-decoration: none;
-  }
-}
-```
-
-#### **Mixins:**
-
-Mixins are reusable chunks of code, like functions in JavaScript, that allow you to pass in values.
-
-```scss
-@mixin button-styles($color) {
-  background-color: $color;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 5px;
-}
-
-button {
-  @include button-styles(#e74c3c);
-}
-```
-
-#### **Inheritance:**
-
-Sass allows one selector to inherit from another, reducing redundancy in your CSS.
-
-```scss
-.message {
-  padding: 20px;
-  border-radius: 5px;
-}
-
-.success {
-  @extend .message;
-  background-color: #2ecc71;
-}
-
-.error {
-  @extend .message;
-  background-color: #e74c3c;
-}
-```
-
----
-
-### **3. Using Sass in Vue Components**
-
-In Vue components, you can write your styles using `<style lang="scss">` to enable Sass syntax.
-
-#### **Example Vue Component with Sass:**
-
-```vue
-<!-- // App.Vue -->
-
-<template>
-  <div class="container">
-    <h1 class="title">Welcome to Vue with Sass!</h1>
-    <button class="btn-primary">Click Me</button>
-  </div>
-</template>
-
-<script>
-export default {
-  name: "SassExample",
-};
-</script>
-
-<style lang="scss">
-$primary-color: #3498db;
-$secondary-color: #e74c3c;
-
-// Mixin definition
-@mixin button-styles($color) {
-  background-color: $color;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: darken($color, 10%);
-  }
-}
-
-.container {
-  text-align: center;
-  padding: 20px;
-
-  .title {
-    color: $primary-color;
-    font-size: 2em;
-    margin-bottom: 20px;
-  }
-
-  .btn-primary {
-    @include button-styles($primary-color);
-  }
-}
-</style>
-```
-
-#### **Explanation:**
-
-- **Variables:** `$primary-color` and `$secondary-color` are used to manage colors across the component.
-- **Nesting:** Inside the `.container` class, the `.title` and `.btn-primary` are styled.
-- **Mixin:** The `button-styles` mixin helps reuse the button styling logic with different colors.
-
-### **4. Scoped Styles with Sass in Vue**
-
-Vue supports scoped styles to ensure styles only apply to the current component, preventing conflicts.
-
-```vue
-<template>
-  <div class="scoped-container">
-    <p>This is a scoped style!</p>
-  </div>
-</template>
-
-<script>
-export default {
-  name: "ScopedSassExample",
-};
-</script>
-
-<style lang="scss" scoped>
-$scoped-color: #8e44ad;
-
-.scoped-container {
-  background-color: $scoped-color;
-  padding: 10px;
-  border-radius: 5px;
-  p {
-    color: white;
-  }
-}
-</style>
-```
-
-### **5. Global Sass Styles in Vue**
-
-To add global styles across your Vue application, create a `.scss` file (e.g., `global.scss`) and import it in your `main.js`:
-
-```js
-// main.js
-import { createApp } from "vue";
-import App from "./App.vue";
-import "./assets/styles/global.scss";
-
-createApp(App).mount("#app");
-```
-
-You can define global variables, mixins, and more in this file to be used across your components.
-
----
-
-### **Conclusion**
-
-By integrating Sass into Vue.js, you can simplify your styles with features like variables, nesting, and mixins. It helps keep your styles clean, modular, and scalable. Start experimenting with these features and tailor them to your project needs!
+  - We are using SCSS to style the components with features like nesting.
+  - SCSS allows us to create cleaner, more maintainable styles, and scoped styles ensure that the styles apply only to the respective components.
